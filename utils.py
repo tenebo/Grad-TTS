@@ -31,18 +31,20 @@ def latest_checkpoint_path(dir_path, regex="grad_*.pt"):
     f_list = glob.glob(os.path.join(dir_path, regex))
     f_list.sort(key=lambda f: int("".join(filter(str.isdigit, f))))
     x = f_list[-1]
-    return x
+    return x, int("".join(filter(str.isdigit, x)))
 
 
 def load_checkpoint(logdir, model, num=None):
     if num is None:
-        model_path = latest_checkpoint_path(logdir, regex="grad_*.pt")
+        model_path,epoch = latest_checkpoint_path(logdir, regex="grad_*.pt")
+        epoch+=1
     else:
         model_path = os.path.join(logdir, f"grad_{num}.pt")
+        epoch=num+1
     print(f'Loading checkpoint {model_path}...')
     model_dict = torch.load(model_path, map_location=lambda loc, storage: loc)
     model.load_state_dict(model_dict, strict=False)
-    return model
+    return model, epoch
 
 
 def save_figure_to_numpy(fig):
@@ -73,3 +75,7 @@ def save_plot(tensor, savepath):
     plt.savefig(savepath)
     plt.close()
     return
+
+if __name__ == "__main__":
+    a=latest_checkpoint_path("./checkpts", regex="grad_*.pt")
+    print(a) 

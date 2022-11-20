@@ -16,9 +16,10 @@ from torch.utils.tensorboard import SummaryWriter
 import params
 from model import GradTTS
 from data import TextMelDataset, TextMelBatchCollate
-from utils import plot_tensor, save_plot
+from utils import plot_tensor, save_plot, load_checkpoint
 from text.symbols import symbols
 
+import argparse
 
 train_filelist_path = params.train_filelist_path
 valid_filelist_path = params.valid_filelist_path
@@ -58,6 +59,10 @@ pe_scale = params.pe_scale
 cleaned_text = params.cleaned_text
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-c","--continues", action="store_true")
+    args = parser.parse_args()
+
     torch.manual_seed(random_seed)
     np.random.seed(random_seed)
 
@@ -95,9 +100,15 @@ if __name__ == "__main__":
                          global_step=0, dataformats='HWC')
         save_plot(mel.squeeze(), f'{log_dir}/original_{i}.png')
 
+
+    epoch_str=1
+    if args.continues:
+        print("Continuing training...")
+        _,epoch_str=load_checkpoint(log_dir,model)
+    
     print('Start training...')
     iteration = 0
-    for epoch in range(1, n_epochs + 1):
+    for epoch in range(epoch_str, n_epochs + 1):
         model.train()
         dur_losses = []
         prior_losses = []

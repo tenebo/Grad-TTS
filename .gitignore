@@ -1,2 +1,8 @@
 __pycache__
 .DS_store
+checkpts/*.pt
+model/monotonic_align/**/core.c
+model/monotonic_align/build
+model/monotonic_align/model
+
+inference_cpu.ipynb
