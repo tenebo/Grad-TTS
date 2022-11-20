@@ -55,6 +55,7 @@ beta_min = params.beta_min
 beta_max = params.beta_max
 pe_scale = params.pe_scale
 
+cleaned_text = params.cleaned_text
 
 if __name__ == "__main__":
     torch.manual_seed(random_seed)
@@ -66,14 +67,14 @@ if __name__ == "__main__":
     print('Initializing data loaders...')
     train_dataset = TextMelDataset(train_filelist_path, cmudict_path, add_blank,
                                    n_fft, n_feats, sample_rate, hop_length,
-                                   win_length, f_min, f_max)
+                                   win_length, f_min, f_max, cleaned_text=cleaned_text)
     batch_collate = TextMelBatchCollate()
     loader = DataLoader(dataset=train_dataset, batch_size=batch_size,
                         collate_fn=batch_collate, drop_last=True,
                         num_workers=4, shuffle=False)
     test_dataset = TextMelDataset(valid_filelist_path, cmudict_path, add_blank,
                                   n_fft, n_feats, sample_rate, hop_length,
-                                  win_length, f_min, f_max)
+                                  win_length, f_min, f_max, cleaned_text=cleaned_text)
 
     print('Initializing model...')
     model = GradTTS(nsymbols, 1, None, n_enc_channels, filter_channels, filter_channels_dp, 

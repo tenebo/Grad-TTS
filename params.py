@@ -10,9 +10,10 @@ from model.utils import fix_len_compatibility
 
 
 # data parameters
-train_filelist_path = 'resources/filelists/ljspeech/train.txt'
-valid_filelist_path = 'resources/filelists/ljspeech/valid.txt'
-test_filelist_path = 'resources/filelists/ljspeech/test.txt'
+cleaned_text = True
+train_filelist_path = 'filelists/ljs_audio_text_train_filelist.txt.cleaned'
+valid_filelist_path = 'filelists/ljs_audio_text_val_filelist.txt.cleaned'
+test_filelist_path = 'filelists/ljs_audio_text_test_filelist.txt.cleaned'
 cmudict_path = 'resources/cmu_dictionary'
 add_blank = True
 n_feats = 80
@@ -43,7 +44,7 @@ beta_max = 20.0
 pe_scale = 1000  # 1 for `grad-tts-old.pt` checkpoint
 
 # training parameters
-log_dir = 'logs/new_exp'
+log_dir = '/content/drive/My Drive/Colab Notebooks/data/radtts/gradtts/kss'
 test_size = 4
 n_epochs = 10000
 batch_size = 16

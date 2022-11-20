@@ -12,7 +12,7 @@ import numpy as np
 import torch
 import torchaudio as ta
 
-from text import text_to_sequence, cmudict
+from text import text_to_sequence, cmudict, cleaned_text_to_sequence
 from text.symbols import symbols
 from utils import parse_filelist, intersperse
 from model.utils import fix_len_compatibility
@@ -26,7 +26,8 @@ from meldataset import mel_spectrogram
 class TextMelDataset(torch.utils.data.Dataset):
     def __init__(self, filelist_path, cmudict_path, add_blank=True,
                  n_fft=1024, n_mels=80, sample_rate=22050,
-                 hop_length=256, win_length=1024, f_min=0., f_max=8000):
+                 hop_length=256, win_length=1024, f_min=0., f_max=8000, cleaned_text=True):
+        self.cleaned_text = cleaned_text
         self.filepaths_and_text = parse_filelist(filelist_path)
         self.cmudict = cmudict.CMUDict(cmudict_path)
         self.add_blank = add_blank
@@ -54,7 +55,10 @@ class TextMelDataset(torch.utils.data.Dataset):
         return mel
 
     def get_text(self, text, add_blank=True):
-        text_norm = text_to_sequence(text, dictionary=self.cmudict)
+        if self.cleaned_text:
+            text_norm = cleaned_text_to_sequence(text)
+        else:
+            text_norm = text_to_sequence(text, dictionary=self.cmudict)
         if self.add_blank:
             text_norm = intersperse(text_norm, len(symbols))  # add a blank token, whose id number is len(symbols)
         text_norm = torch.IntTensor(text_norm)
@@ -103,8 +107,9 @@ class TextMelBatchCollate(object):
 class TextMelSpeakerDataset(torch.utils.data.Dataset):
     def __init__(self, filelist_path, cmudict_path, add_blank=True,
                  n_fft=1024, n_mels=80, sample_rate=22050,
-                 hop_length=256, win_length=1024, f_min=0., f_max=8000):
+                 hop_length=256, win_length=1024, f_min=0., f_max=8000, cleaned_text=True):
         super().__init__()
+        self.cleaned_text = cleaned_text
         self.filelist = parse_filelist(filelist_path, split_char='|')
         self.cmudict = cmudict.CMUDict(cmudict_path)
         self.n_fft = n_fft
@@ -133,7 +138,10 @@ class TextMelSpeakerDataset(torch.utils.data.Dataset):
         return mel
 
     def get_text(self, text, add_blank=True):
-        text_norm = text_to_sequence(text, dictionary=self.cmudict)
+        if self.cleaned_text:
+            text_norm = cleaned_text_to_sequence(text)
+        else:
+            text_norm = text_to_sequence(text, dictionary=self.cmudict)
         if self.add_blank:
             text_norm = intersperse(text_norm, len(symbols))  # add a blank token, whose id number is len(symbols)
         text_norm = torch.LongTensor(text_norm)
