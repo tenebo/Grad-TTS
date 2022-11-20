@@ -19,7 +19,8 @@ def get_arpabet(word, dictionary):
         return word
 
 
-def text_to_sequence(text, cleaner_names=["english_cleaners"], dictionary=None):
+def text_to_sequence(text, cleaner_names=["korean_cleaners"], dictionary=None):
+    dictionary=None
     '''Converts a string of text to a sequence of IDs corresponding to the symbols in the text.
 
     The text can optionally have ARPAbet sequences enclosed in curly braces embedded
@@ -94,3 +95,22 @@ def _arpabet_to_sequence(text):
 
 def _should_keep_symbol(s):
     return s in _symbol_to_id and s != '_' and s != '~'
+
+if __name__ == "__main__":
+    from .korean import detokenize
+    from .cmudict import CMUDict
+    def intersperse(lst, item):
+        # Adds blank symbol
+        result = [item] * (len(lst) * 2 + 1)
+        result[1::2] = lst
+        return result
+    cmudict = CMUDict('resources/cmu_dictionary')
+    # a=text_to_sequence("노무현 응디 노무노무 딱좋다 /GN/",['korean_cleaners'])
+    # print(a)
+    text_norm = text_to_sequence("노무현 응디 노무노무 딱좋다 /GN/", dictionary=cmudict)
+    a = intersperse(text_norm, len(symbols))  # add a blank token, whose id number is len(symbols)
+    print(a)
+    print(text_norm)
+    # text_norm = torch.LongTensor(text_norm)
+    # b=detokenize([_id_to_symbol[i] for i in a])
+    # print(b)

@@ -3,7 +3,7 @@
 import re
 from unidecode import unidecode
 from .numbers import normalize_numbers
-
+from .korean import tokenize as korean_tokenize
 
 _whitespace_re = re.compile(r'\s+')
 
@@ -70,4 +70,8 @@ def english_cleaners(text):
     text = expand_numbers(text)
     text = expand_abbreviations(text)
     text = collapse_whitespace(text)
+    return text
+
+def korean_cleaners(text):
+    text = korean_tokenize(text)
     return text
