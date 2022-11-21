@@ -49,10 +49,9 @@ def load_checkpoint(logdir, model, num=None):
 def warm_load_checkpoint(logdir, model, num=None):
     if num is None:
         model_path,epoch = latest_checkpoint_path(logdir, regex="grad_*.pt")
-        epoch+=1
     else:
         model_path = os.path.join(logdir, f"grad_{num}.pt")
-        epoch=num+1
+    epoch=1
     print(f'Loading checkpoint {model_path}...')
     pretrained_dict = torch.load(model_path, map_location=lambda loc, storage: loc)
     model_dict = model.state_dict()
