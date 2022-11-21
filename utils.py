@@ -62,6 +62,7 @@ def warm_load_checkpoint(logdir, model, num=None):
     if (pretrained_dict['encoder.emb.weight'].shape !=
             model_dict['encoder.emb.weight'].shape):
         del pretrained_dict['encoder.emb.weight']
+        print("deleted encoder.emb.weight")
 
     model_dict.update(pretrained_dict)
     model.load_state_dict(model_dict, strict=False)

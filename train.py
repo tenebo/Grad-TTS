@@ -16,7 +16,7 @@ from torch.utils.tensorboard import SummaryWriter
 import params
 from model import GradTTS
 from data import TextMelDataset, TextMelBatchCollate
-from utils import plot_tensor, save_plot, load_checkpoint
+from utils import plot_tensor, save_plot, load_checkpoint, warm_load_checkpoint
 from text.symbols import symbols
 
 import argparse
@@ -61,6 +61,7 @@ cleaned_text = params.cleaned_text
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-c","--continues", action="store_true")
+    parser.add_argument('-w','--warmstart', default="")
     args = parser.parse_args()
 
     torch.manual_seed(random_seed)
@@ -105,6 +106,9 @@ if __name__ == "__main__":
     if args.continues:
         print("Continuing training...")
         _,epoch_str=load_checkpoint(log_dir,model)
+
+    if args.warmstart!="":
+        _,epoch_str=warm_load_checkpoint(args.warmstart,model)
     
     print('Start training...')
     iteration = 0
