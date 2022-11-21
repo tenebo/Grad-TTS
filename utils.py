@@ -46,6 +46,26 @@ def load_checkpoint(logdir, model, num=None):
     model.load_state_dict(model_dict, strict=False)
     return model, epoch
 
+def warm_load_checkpoint(logdir, model, num=None):
+    if num is None:
+        model_path,epoch = latest_checkpoint_path(logdir, regex="grad_*.pt")
+        epoch+=1
+    else:
+        model_path = os.path.join(logdir, f"grad_{num}.pt")
+        epoch=num+1
+    print(f'Loading checkpoint {model_path}...')
+    pretrained_dict = torch.load(model_path, map_location=lambda loc, storage: loc)
+    model_dict = model.state_dict()
+    pretrained_dict = {k: v for k, v in pretrained_dict.items()
+                       if k in model_dict}
+
+    if (pretrained_dict['encoder.emb.weight'].shape !=
+            model_dict['encoder.emb.weight'].shape):
+        del pretrained_dict['encoder.emb.weight']
+
+    model_dict.update(pretrained_dict)
+    model.load_state_dict(model_dict, strict=False)
+    return model, epoch
 
 def save_figure_to_numpy(fig):
     data = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
